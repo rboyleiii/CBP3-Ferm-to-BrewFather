@@ -1,7 +1,7 @@
 from modules import cbpi
 import requests
 
-bf_uri = "http://log.brewfather.net/stream?id="
+bf_uri = "http://log.brewfather.net/stream"
 
 def bf_api_id():
   api_id = cbpi.get_config_parameter("brewfather_api_id", None)
@@ -27,13 +27,24 @@ def brewfather_background_task(api):
       try:
         name = fermenter.name
         temp = fermenter.instance.get_temp()
+        #auxtemp = cbpi.get_sensor_value(int(fermenter.sensor2))
+        #exttemp = cbpi.get_sensor_value(int(fermenter.sensor3))
+        #brewname = fermenter.brewname
         unit = cbpi.get_config_parameter("unit", "C")
+        
         data = {
           "name": name, 
           "temp": temp, 
+          #"aux_temp": auxtemp,
+          #"ext_temp": exttemp, 
           "temp_unit": unit
+          #"beer": brewname
         }
-        response = requests.post(bf_uri + api_id, json=data)
+
+        querystring = {"id": api_id }
+
+        response = requests.post(bf_uri, json=data, params=querystring)
+
         if response.status_code != 200:
           cbpi.notify("Brewfather Error", "Received unsuccessful response. Ensure API Id is correct. HTTP Error Code: " + str(response.status_code), type="danger", timeout=None)
       except:
