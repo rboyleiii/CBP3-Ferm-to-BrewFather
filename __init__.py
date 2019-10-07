@@ -1,7 +1,7 @@
 from modules import cbpi
 import requests
 
-bf_uri = "http://log.brewfather.net/stream?id="
+bf_uri = "http://log.brewfather.net/stream"
 
 def bf_api_id():
   api_id = cbpi.get_config_parameter("brewfather_api_id", None)
@@ -23,19 +23,28 @@ def brewfather_background_task(api):
     return
 
   for i, fermenter in cbpi.cache.get("fermenter").iteritems():
-    if fermenter.state is not False:
+
+    # if we have a beer name, we will log the temperatures
+    if fermenter.brewname and fermenter.brewname.strip():
       try:
-        name = fermenter.name
-        temp = fermenter.instance.get_temp()
-        unit = cbpi.get_config_parameter("unit", "C")
-        data = {
-          "name": name, 
-          "temp": temp, 
-          "temp_unit": unit
+        queryString = {
+          "id": api_id
         }
-        response = requests.post(bf_uri + api_id, json=data)
+        
+        data = {
+          "name": fermenter.name,
+          "beer": fermenter.brewname,
+          "temp": cbpi.get_sensor_value(fermenter.sensor), 
+          "aux_temp": cbpi.get_sensor_value(fermenter.sensor2), 
+          "ext_temp": cbpi.get_sensor_value(fermenter.sensor3), 
+          "temp_unit": cbpi.get_config_parameter("unit", "C")
+        }
+
+        response = requests.post(bf_uri, params=queryString, json=data)
+
         if response.status_code != 200:
           cbpi.notify("Brewfather Error", "Received unsuccessful response. Ensure API Id is correct. HTTP Error Code: " + str(response.status_code), type="danger", timeout=None)
-      except:
-        cbpi.notify("Brewfather Error", "Unable to send message.", type="danger", timeout=None)
+
+      except BaseException as error:
+        cbpi.notify("Brewfather Error", "Unable to send message." + str(error), type="danger", timeout=None)
         pass
