@@ -1,6 +1,6 @@
 # Brewfather (brewfather.app) custom stream plugin for CraftBeerPi3
 
-Use this plugin to send your fermentation temperatures to Brewfather
+Use this plugin to send your fermentation temperatures to Brewfather stream
 
 ## Installation
 
@@ -12,7 +12,7 @@ Set the API Id from https://web.brewfather.app/#/tabs/settings/settings
 
 Temperatures will update every 15 minutes to Brewfather.
 
-The fermenter must have a value set for `Brew Name` for it to report readings to Brewfather.
+The fermenter must be active (running) for it to report readings to Brewfather.
 
 You can attach the device (by fermenter name) to a batch under the Fermentation tab in Brewfather.
 
