@@ -3,7 +3,7 @@ import requests
 
 bf_uri = "http://log.brewfather.net/stream"
 
-def bf_stream_id ():
+def bf_stream_id():
   api_id = cbpi.get_config_parameter("brewfather_stream_id", None)
   if api_id is None:
     try:
@@ -15,8 +15,8 @@ def bf_stream_id ():
     return api_id
 
 
-@cbpi.backgroundtask(key="brewfather_task", interval=900)
-def brewfather_background_task(api):
+@cbpi.backgroundtask(key="brewfather_fermtask", interval=900)
+def brewfather_background_fermtask(api):
   api_id = bf_stream_id()
   if api_id == "":
     cbpi.notify("Brewfather Error", "Stream ID not set. Update brewfather_stream_id parameter within System > Parameters.", type="danger", timeout=None)
